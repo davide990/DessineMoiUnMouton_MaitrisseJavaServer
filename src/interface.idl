@@ -24,9 +24,9 @@ module dessine_module{
 	interface Communication {
 		void registerProducer(in HostInfo info) raises(Reject);
 
-		string pushInfo(in Image image, in HostInfo producerInfo) raises(Reject); //Return a ticket that will be used for pulling the response
+		string pushImage(in Image image, in HostInfo producerInfo) raises(Reject); //Return a ticket that will be used for pulling the response
 
-		void readyForPull(in string ticket);
+		void readyForPull(in string ticket, in HostInfo producerInfo);
 		StringArray pullComments(in string ticket) raises(Reject);
 
 		void disconnect(in HostInfo info);
