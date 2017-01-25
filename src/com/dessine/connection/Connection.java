@@ -1,4 +1,4 @@
-package com.dessine;
+package com.dessine.connection;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
