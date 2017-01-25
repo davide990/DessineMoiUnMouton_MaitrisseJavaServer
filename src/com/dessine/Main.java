@@ -6,9 +6,11 @@ import java.util.logging.Logger;
 
 import com.dessine.connection.BackgroundConnection;
 import com.dessine.connection.ConnectionListener;
+import com.dessine.corba.Event;
 import com.dessine.ui.MainWindowController;
 import com.dessine.ui.MainWindowListener;
 
+import dessine_module.Image;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -42,6 +44,11 @@ public class Main extends Application implements MainWindowListener, ConnectionL
 
 	private void setupUI() {
 		mainWindowController.setListener(this);
+		Image i = new Image();
+		i.width = 800;
+		i.height = 600;
+		i.bytesCount = 0;
+		mainWindowController.addImage(i, 0);
 	}
 
 	public static void main(String[] args) {
@@ -58,24 +65,28 @@ public class Main extends Application implements MainWindowListener, ConnectionL
 	public void startServerButtonClicked() {
 		connection = BackgroundConnection.getConnection(IOR_FNAME, new String[] {}, this);
 		connection.start();
-		Logger.getLogger(getClass().getName()).log(Level.INFO, "Connection started...");
 	}
 
 	@Override
 	public void stopServerButtonClicked() {
 		connection.stopConnection();
-		Logger.getLogger(getClass().getName()).log(Level.INFO, "Connection stopped");
+
 	}
 
 	@Override
 	public void connectionStarted() {
-		// TODO Auto-generated method stub
+		Logger.getLogger(getClass().getName()).log(Level.INFO, "Connection started...");
 
 	}
 
 	@Override
 	public void connectionStopped() {
-		// TODO Auto-generated method stub
+		Logger.getLogger(getClass().getName()).log(Level.INFO, "Connection stopped");
+	}
+
+	@Override
+	public void receiveResult(int ticket, Event event) {
+		mainWindowController.addImage(event.image(), ticket);
 
 	}
 

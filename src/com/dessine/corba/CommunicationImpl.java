@@ -6,6 +6,8 @@ import java.util.logging.Logger;
 
 import org.omg.CORBA.ORB;
 
+import com.dessine.connection.ConnectionListener;
+
 import dessine_module.Communication;
 import dessine_module.CommunicationHelper;
 import dessine_module.CommunicationPOA;
@@ -19,7 +21,7 @@ public class CommunicationImpl extends CommunicationPOA {
 	private EventQueue incomingQueue;
 	private EventQueue outoingQueue;
 	private List<HostInfo> producers;
-	public CommunicationListener listener;
+	public ConnectionListener listener;
 
 	public CommunicationImpl() {
 		lock = new Object();

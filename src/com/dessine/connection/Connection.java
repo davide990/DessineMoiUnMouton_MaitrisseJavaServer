@@ -36,7 +36,7 @@ public class Connection {
 		orb.run();
 	}
 
-	public static Connection createConnection(String iorFname, String[] args) {
+	public static Connection createConnection(String iorFname, String[] args, ConnectionListener listener) {
 		Connection c = new Connection();
 		try {
 			c.orb = ORB.init(args, null);
@@ -44,21 +44,16 @@ public class Connection {
 
 			CommunicationImpl communication = new CommunicationImpl();
 
-			communication.listener = new CommunicationListener() {
-
-				@Override
-				public void receiveResult(int ticket, Event event) {
-					try {
-						Event e = event;
-						e.host().type = HostType.SERVER;
-
-						// send the response
-						communication.pushImage(e.image(), e.host());
-					} catch (Reject e) {
-						e.printStackTrace();
-					}
-				}
-			};
+			communication.listener = listener;
+			/*
+			 * communication.listener = new CommunicationListener() {
+			 * 
+			 * @Override public void receiveResult(int ticket, Event event) {
+			 * try { Event e = event; e.host().type = HostType.SERVER;
+			 * 
+			 * // send the response communication.pushImage(e.image(),
+			 * e.host()); } catch (Reject e) { e.printStackTrace(); } } };
+			 */
 
 			byte[] objID = c.rootPOA.activate_object(communication);
 

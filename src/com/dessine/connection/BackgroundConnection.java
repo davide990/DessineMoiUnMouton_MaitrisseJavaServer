@@ -15,7 +15,7 @@ public class BackgroundConnection extends Thread {
 		Objects.requireNonNull(iorFname);
 		
 		BackgroundConnection c = new BackgroundConnection();
-		c.connection = Connection.createConnection(iorFname, args);
+		c.connection = Connection.createConnection(iorFname, args, listener);
 		c.listener = listener;
 		
 		return c;
