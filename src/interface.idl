@@ -1,0 +1,43 @@
+module dessine_module{
+
+    exception Reject { string message; };
+
+    enum HostType {CLIENT, SERVER};
+    typedef sequence<octet> ByteArray;
+    typedef sequence<string> StringArray;
+
+    struct HostInfo {
+        string ipAddress;
+        string port;
+        string hostName;
+		string ior;
+        HostType type;
+    };
+
+    struct Image {
+        ByteArray data;
+        unsigned long bytesCount;
+        unsigned long height;
+        unsigned long width;
+    };
+
+	interface Communication {
+		void registerProducer(in HostInfo info) raises(Reject);
+
+		string pushInfo(in Image image, in HostInfo producerInfo) raises(Reject); //Return a ticket that will be used for pulling the response
+
+		void readyForPull(in string ticket);
+		StringArray pullComments(in string ticket) raises(Reject);
+
+		void disconnect(in HostInfo info);
+	};
+
+
+    interface Dessine {
+        boolean sendImage(in Image img, in HostInfo destination) raises(Reject);
+        boolean sendComments(in StringArray comments, in HostInfo destination) raises(Reject);
+        boolean sendImageWithComments(in Image img, in StringArray comments, in HostInfo destination) raises(Reject);
+    };
+};
+
+
