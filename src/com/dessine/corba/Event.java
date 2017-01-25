@@ -40,7 +40,7 @@ public class Event {
 
 	@Override
 	public String toString() {
-		return "Event [Image " + +image.width + "x" + image.height + " Bytes: " + image.bytesCount + ", host=" + host
+		return "Event [Image " +image.width + "x" + image.height + " Bytes: " + image.bytesCount + ", host=" + host
 				+ "]";
 	}
 }
