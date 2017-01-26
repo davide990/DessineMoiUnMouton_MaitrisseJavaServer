@@ -37,6 +37,7 @@ public class Main extends Application implements MainWindowListener, ConnectionL
 			primaryStage.show();
 
 			mainWindowController.setListener(this);
+			mainWindowController.init();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -78,6 +79,12 @@ public class Main extends Application implements MainWindowListener, ConnectionL
 	@Override
 	public void receiveResult(int ticket, Event event) {
 		mainWindowController.addImage(event.image(), ticket);
+	}
+
+	@Override
+	public void addedComment(String s) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

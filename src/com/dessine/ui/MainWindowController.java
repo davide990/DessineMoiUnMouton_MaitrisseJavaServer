@@ -4,6 +4,10 @@ import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.annotation.PostConstruct;
+
+import com.dessine.corba.Event;
+
 import dessine_module.Image;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -11,8 +15,10 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.util.Callback;
 
 public class MainWindowController {
 
@@ -28,7 +34,7 @@ public class MainWindowController {
 	private Button stopServerButton;
 
 	@FXML
-	private ListView<String> listView;
+	private ListView<EventListEntry> listView;
 
 	@FXML
 	private Button addCommentButton;
@@ -39,17 +45,32 @@ public class MainWindowController {
 	@FXML
 	private ListView<String> commentsListView;
 
-	public static final ObservableList<String> images = FXCollections.observableArrayList();
+	public static final ObservableList<EventListEntry> events = FXCollections.observableArrayList();
 	public static final ObservableList<String> comments = FXCollections.observableArrayList();
+
+	public void init() {
+		listView.setCellFactory(param -> new ListCell<EventListEntry>() {
+			@Override
+			protected void updateItem(EventListEntry item, boolean empty) {
+				super.updateItem(item, empty);
+
+				if (empty || item == null) {
+					setText(null);
+				} else {
+					setText("Image (Ticket:" + Integer.toString(item.ticket()) + ") " + item.image().width + "x"
+							+ item.image().height + " Bytes: " + item.image().bytesCount);
+				}
+			}
+		});
+	}
 
 	public void addImage(Image image, int Ticket) {
 
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
-				images.add("Image (Ticket:" + Integer.toString(Ticket) + ") " + image.width + "x" + image.height
-						+ " Bytes: " + image.bytesCount);
-				listView.setItems(images);
+				events.add(new EventListEntry(image, Ticket));
+				listView.setItems(events);
 			}
 		});
 	}
@@ -92,9 +113,14 @@ public class MainWindowController {
 	void onAddCommentButtonClicked(ActionEvent e) {
 		Logger.getLogger(MainWindowController.class.getName()).log(Level.INFO, "Added comment");
 
-		comments.add(commentTextField.getText());
+		String comment = commentTextField.getText();
+		comments.add(comment);
 		commentsListView.setItems(comments);
 		commentTextField.setText("");
+
+		if (listener != null) {
+			listener.addedComment(comment);
+		}
 	}
 
 }
