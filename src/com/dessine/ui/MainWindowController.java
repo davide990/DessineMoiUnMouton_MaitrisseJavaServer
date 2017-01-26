@@ -4,12 +4,13 @@ import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.annotation.PostConstruct;
-
 import com.dessine.corba.Event;
 
+import dessine_module.HostInfo;
 import dessine_module.Image;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -18,7 +19,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
-import javafx.util.Callback;
+import javafx.scene.input.MouseEvent;
 
 public class MainWindowController {
 
@@ -57,19 +58,32 @@ public class MainWindowController {
 				if (empty || item == null) {
 					setText(null);
 				} else {
-					setText("Image (Ticket:" + Integer.toString(item.ticket()) + ") " + item.image().width + "x"
-							+ item.image().height + " Bytes: " + item.image().bytesCount);
+					setText("Image (Ticket:" + Integer.toString(item.ticket()) + ") " + item.event().image().width + "x"
+							+ item.event().image().height + " Bytes: " + item.event().image().bytesCount);
+				}
+			}
+		});
+
+		listView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<EventListEntry>() {
+			@Override
+			public void changed(ObservableValue<? extends EventListEntry> observable, EventListEntry oldValue,
+					EventListEntry newValue) {
+				Logger.getLogger(MainWindowController.class.getName()).log(Level.INFO,
+						"Selected ticket " + newValue.ticket());
+
+				if (listener != null) {
+					listener.imageSelected(newValue.event(), newValue.ticket());
 				}
 			}
 		});
 	}
 
-	public void addImage(Image image, int Ticket) {
+	public void addEvent(Event event, int Ticket) {
 
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
-				events.add(new EventListEntry(image, Ticket));
+				events.add(new EventListEntry(event, Ticket));
 				listView.setItems(events);
 			}
 		});
@@ -121,6 +135,11 @@ public class MainWindowController {
 		if (listener != null) {
 			listener.addedComment(comment);
 		}
+	}
+
+	public void clearComments() {
+		comments.clear();
+		commentsListView.setItems(comments);
 	}
 
 }

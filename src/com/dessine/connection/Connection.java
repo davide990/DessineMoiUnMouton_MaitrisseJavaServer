@@ -11,6 +11,9 @@ import org.omg.CORBA.ORBPackage.InvalidName;
 import org.omg.PortableServer.POA;
 import org.omg.PortableServer.POAHelper;
 import org.omg.PortableServer.POAManagerPackage.AdapterInactive;
+import org.omg.PortableServer.POAPackage.ObjectNotActive;
+import org.omg.PortableServer.POAPackage.ServantAlreadyActive;
+import org.omg.PortableServer.POAPackage.WrongPolicy;
 
 import com.dessine.corba.CommunicationImpl;
 import com.dessine.corba.Event;
@@ -46,9 +49,22 @@ public class Connection {
 			c.instance = new CommunicationImpl();
 			c.instance.listener = listener;
 			c.rootPOA.the_POAManager().activate();
-		} catch (InvalidName | AdapterInactive ex) {
+			byte[] connectionID = c.rootPOA.activate_object(c.instance);
+			writeORBReferenceToFile(c.orb, c.rootPOA, connectionID, iorFname);
+
+		} catch (InvalidName | AdapterInactive | ObjectNotActive | FileNotFoundException | WrongPolicy
+				| ServantAlreadyActive ex) {
 			Logger.getLogger(Connection.class.getName()).log(Level.SEVERE, null, ex);
 		}
 		return c;
 	}
+
+	private static void writeORBReferenceToFile(ORB orb, POA rootPOA, byte[] objRef, String filePath)
+			throws ObjectNotActive, FileNotFoundException, WrongPolicy {
+		String reference = orb.object_to_string(rootPOA.id_to_reference(objRef));
+		try (PrintWriter file = new PrintWriter(filePath)) {
+			file.println(reference);
+		}
+	}
+
 }

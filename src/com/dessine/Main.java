@@ -1,6 +1,8 @@
 package com.dessine;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -11,6 +13,7 @@ import com.dessine.corba.Event;
 import com.dessine.ui.MainWindowController;
 import com.dessine.ui.MainWindowListener;
 
+import dessine_module.Reject;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -22,6 +25,14 @@ public class Main extends Application implements MainWindowListener, ConnectionL
 	private static String IOR_FNAME = "/tmp/ior";
 	private MainWindowController mainWindowController;
 	private BackgroundConnection connection;
+
+	Event selectedEvent;
+	int selectedEventTicket;
+	List<String> comments;
+
+	public Main() {
+		comments = new ArrayList<>();
+	}
 
 	@Override
 	public void start(Stage primaryStage) {
@@ -49,8 +60,18 @@ public class Main extends Application implements MainWindowListener, ConnectionL
 
 	@Override
 	public void sendBackButtonClicked() {
-		// TODO Auto-generated method stub
 
+		Event e = new Event(selectedEvent.image(), selectedEvent.host());
+		comments.forEach(c -> e.addComment(c));
+
+		// Create a new Event with the comments
+		try {
+			connection.connection().pushOutgoing(e);
+		} catch (Reject e1) {
+			e1.printStackTrace();
+		}
+		
+		mainWindowController.clearComments();
 	}
 
 	@Override
@@ -78,13 +99,18 @@ public class Main extends Application implements MainWindowListener, ConnectionL
 
 	@Override
 	public void receiveResult(int ticket, Event event) {
-		mainWindowController.addImage(event.image(), ticket);
+		mainWindowController.addEvent(event, ticket);
 	}
 
 	@Override
 	public void addedComment(String s) {
-		// TODO Auto-generated method stub
-		
+		comments.add(s);
+	}
+
+	@Override
+	public void imageSelected(Event event, int ticket) {
+		selectedEvent = event;
+		selectedEventTicket = ticket;
 	}
 
 }
