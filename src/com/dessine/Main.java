@@ -1,6 +1,7 @@
 package com.dessine;
 
 import java.io.IOException;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -10,9 +11,6 @@ import com.dessine.corba.Event;
 import com.dessine.ui.MainWindowController;
 import com.dessine.ui.MainWindowListener;
 
-import dessine_module.HostType;
-import dessine_module.Image;
-import dessine_module.Reject;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -38,19 +36,10 @@ public class Main extends Application implements MainWindowListener, ConnectionL
 			primaryStage.setScene(scene);
 			primaryStage.show();
 
-			setupUI();
+			mainWindowController.setListener(this);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
-
-	private void setupUI() {
-		mainWindowController.setListener(this);
-		Image i = new Image();
-		i.width = 800;
-		i.height = 600;
-		i.bytesCount = 0;
-		mainWindowController.addImage(i, 0);
 	}
 
 	public static void main(String[] args) {
@@ -65,7 +54,7 @@ public class Main extends Application implements MainWindowListener, ConnectionL
 
 	@Override
 	public void startServerButtonClicked() {
-		connection = BackgroundConnection.getConnection(IOR_FNAME, new String[] {}, this);
+		connection = BackgroundConnection.getConnection(IOR_FNAME, new String[] {}, new Properties(), this);
 		connection.start();
 	}
 
@@ -89,15 +78,6 @@ public class Main extends Application implements MainWindowListener, ConnectionL
 	@Override
 	public void receiveResult(int ticket, Event event) {
 		mainWindowController.addImage(event.image(), ticket);
-		/*try {
-			Event e = event;
-			e.host().type = HostType.SERVER;
-
-			// send the response 
-			connection.pushImage(e.image(), e.host());
-		} catch (Reject e) {
-			e.printStackTrace();
-		}*/
 	}
 
 }

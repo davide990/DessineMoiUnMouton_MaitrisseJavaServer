@@ -1,6 +1,7 @@
 package com.dessine.connection;
 
 import java.util.Objects;
+import java.util.Properties;
 
 public class BackgroundConnection extends Thread {
 
@@ -10,14 +11,15 @@ public class BackgroundConnection extends Thread {
 	private BackgroundConnection() {
 	}
 
-	public static BackgroundConnection getConnection(String iorFname, String[] args, ConnectionListener listener) {
+	public static BackgroundConnection getConnection(String iorFname, String[] args, Properties prop,
+			ConnectionListener listener) {
 		Objects.requireNonNull(listener);
 		Objects.requireNonNull(iorFname);
-		
+
 		BackgroundConnection c = new BackgroundConnection();
-		c.connection = Connection.createConnection(iorFname, args, listener);
+		c.connection = Connection.createConnection(iorFname, args, prop, listener);
 		c.listener = listener;
-		
+
 		return c;
 	}
 
@@ -25,13 +27,16 @@ public class BackgroundConnection extends Thread {
 		this.listener = listener;
 	}
 
+	public Connection connection() {
+		return connection;
+	}
+
 	public void run() {
 		listener.connectionStarted();
 		connection.start();
 	}
-	
-	public void stopConnection()
-	{
+
+	public void stopConnection() {
 		connection.stop();
 	}
 }

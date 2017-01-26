@@ -12,6 +12,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TextField;
 
 public class MainWindowController {
 
@@ -29,20 +30,28 @@ public class MainWindowController {
 	@FXML
 	private ListView<String> listView;
 
+	@FXML
+	private Button addCommentButton;
+
+	@FXML
+	private TextField commentTextField;
+
+	@FXML
+	private ListView<String> commentsListView;
+
 	public static final ObservableList<String> images = FXCollections.observableArrayList();
+	public static final ObservableList<String> comments = FXCollections.observableArrayList();
 
 	public void addImage(Image image, int Ticket) {
-		
-		Platform.runLater(new Runnable(){
 
+		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
-				images.add("Image (Ticket:" + Integer.toString(Ticket) + ") " + image.width + "x" + image.height + " Bytes: "
-						+ image.bytesCount);
+				images.add("Image (Ticket:" + Integer.toString(Ticket) + ") " + image.width + "x" + image.height
+						+ " Bytes: " + image.bytesCount);
 				listView.setItems(images);
 			}
-			});
-		
+		});
 	}
 
 	public void setListener(MainWindowListener listener) {
@@ -78,4 +87,14 @@ public class MainWindowController {
 			listener.stopServerButtonClicked();
 		}
 	}
+
+	@FXML
+	void onAddCommentButtonClicked(ActionEvent e) {
+		Logger.getLogger(MainWindowController.class.getName()).log(Level.INFO, "Added comment");
+
+		comments.add(commentTextField.getText());
+		commentsListView.setItems(comments);
+		commentTextField.setText("");
+	}
+
 }
