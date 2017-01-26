@@ -44,8 +44,22 @@ public class CommunicationImpl extends CommunicationPOA {
 		}
 	}
 
+	public String pushOutgoing(Event e) throws Reject {
+		int ticket = -1;
+		synchronized (lock) {
+			ticket = outoingQueue.insert(e);
+		}
+		Logger.getLogger(CommunicationImpl.class.getName()).info("Added outgoing event: " + e);
+		readyForPull(Integer.toString(ticket), e.host()); // host -> client
+
+		return Integer.toString(ticket);
+	}
+
 	@Override
 	public String pushImage(Image info, HostInfo host) throws Reject {
+		if (host.type == HostType.SERVER)
+			throw new Reject("Forbidden. Only Clients ");
+
 		Event e = new Event(info, host);
 		int ticket = -1;
 
@@ -58,13 +72,6 @@ public class CommunicationImpl extends CommunicationPOA {
 
 			// Notify to the consumer that a new information has been sent
 			notifyToConsumer(ticket, e);
-		} else {
-			// Server->Client
-			synchronized (lock) {
-				ticket = outoingQueue.insert(e);
-			}
-			Logger.getLogger(CommunicationImpl.class.getName()).info("Added outgoing event: " + e);
-			readyForPull(Integer.toString(ticket), host); // host -> client
 		}
 
 		return Integer.toString(ticket);
@@ -95,14 +102,19 @@ public class CommunicationImpl extends CommunicationPOA {
 	// TODO remove consumerInfo param
 	@Override
 	public String[] pullComments(String ticket) throws Reject {
-		Event e;
+		Event e = null;
 		Logger.getLogger(CommunicationImpl.class.getName()).info("Pulling info with ticket: " + ticket);
+
 		synchronized (lock) {
 			e = outoingQueue.events().get(Integer.parseInt(ticket));
 			outoingQueue.remove(Integer.parseInt(ticket));
 		}
 		if (e == null)
 			return new String[] { "[EMPTY]" };
+
+		for (String s : e.comments()) {
+			Logger.getLogger(CommunicationImpl.class.getName()).info("--> " + s);
+		}
 
 		return e.comments().toArray(new String[0]);
 

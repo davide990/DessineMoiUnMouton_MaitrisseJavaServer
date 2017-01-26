@@ -10,7 +10,9 @@ import com.dessine.corba.Event;
 import com.dessine.ui.MainWindowController;
 import com.dessine.ui.MainWindowListener;
 
+import dessine_module.HostType;
 import dessine_module.Image;
+import dessine_module.Reject;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -87,7 +89,15 @@ public class Main extends Application implements MainWindowListener, ConnectionL
 	@Override
 	public void receiveResult(int ticket, Event event) {
 		mainWindowController.addImage(event.image(), ticket);
+		/*try {
+			Event e = event;
+			e.host().type = HostType.SERVER;
 
+			// send the response 
+			connection.pushImage(e.image(), e.host());
+		} catch (Reject e) {
+			e.printStackTrace();
+		}*/
 	}
 
 }

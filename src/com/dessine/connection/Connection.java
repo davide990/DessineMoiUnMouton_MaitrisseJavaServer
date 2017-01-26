@@ -15,6 +15,11 @@ import org.omg.PortableServer.POAPackage.ServantAlreadyActive;
 import org.omg.PortableServer.POAPackage.WrongPolicy;
 
 import com.dessine.corba.CommunicationImpl;
+import com.dessine.corba.CommunicationListener;
+import com.dessine.corba.Event;
+
+import dessine_module.HostType;
+import dessine_module.Reject;
 
 public class Connection {
 	private ORB orb;
@@ -40,15 +45,37 @@ public class Connection {
 			CommunicationImpl communication = new CommunicationImpl();
 
 			communication.listener = listener;
-			/*
-			 * communication.listener = new CommunicationListener() {
-			 * 
-			 * @Override public void receiveResult(int ticket, Event event) {
-			 * try { Event e = event; e.host().type = HostType.SERVER;
-			 * 
-			 * // send the response communication.pushImage(e.image(),
-			 * e.host()); } catch (Reject e) { e.printStackTrace(); } } };
-			 */
+
+			communication.listener = new ConnectionListener() {
+
+				@Override
+				public void receiveResult(int ticket, Event event) {
+					try {
+						Event e = event;
+						e.host().type = HostType.SERVER;
+
+						// send the response 
+						e.addComment("wewe");
+						e.addComment("wowo");
+						//communication.pushImage(e.image(), e.host());
+						communication.pushOutgoing(e);
+					} catch (Reject e) {
+						e.printStackTrace();
+					}
+				}
+
+				@Override
+				public void connectionStarted() {
+					// TODO Auto-generated method stub
+
+				}
+
+				@Override
+				public void connectionStopped() {
+					// TODO Auto-generated method stub
+
+				}
+			};
 
 			byte[] objID = c.rootPOA.activate_object(communication);
 
