@@ -19,7 +19,7 @@ import javafx.stage.Stage;
 
 public class Main extends Application implements MainWindowListener, ConnectionListener {
 
-	private static String IOR_FNAME = "/tmp/IOR";
+	private static String IOR_FNAME = "/tmp/ior";
 	private MainWindowController mainWindowController;
 	private BackgroundConnection connection;
 

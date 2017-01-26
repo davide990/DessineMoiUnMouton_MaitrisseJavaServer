@@ -5,6 +5,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import dessine_module.Image;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -31,9 +32,17 @@ public class MainWindowController {
 	public static final ObservableList<String> images = FXCollections.observableArrayList();
 
 	public void addImage(Image image, int Ticket) {
-		images.add("Image (Ticket:" + Integer.toString(Ticket) + ") " + image.width + "x" + image.height + " Bytes: "
-				+ image.bytesCount);
-		listView.setItems(images);
+		
+		Platform.runLater(new Runnable(){
+
+			@Override
+			public void run() {
+				images.add("Image (Ticket:" + Integer.toString(Ticket) + ") " + image.width + "x" + image.height + " Bytes: "
+						+ image.bytesCount);
+				listView.setItems(images);
+			}
+			});
+		
 	}
 
 	public void setListener(MainWindowListener listener) {

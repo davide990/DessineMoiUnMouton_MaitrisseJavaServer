@@ -15,11 +15,6 @@ import org.omg.PortableServer.POAPackage.ServantAlreadyActive;
 import org.omg.PortableServer.POAPackage.WrongPolicy;
 
 import com.dessine.corba.CommunicationImpl;
-import com.dessine.corba.CommunicationListener;
-import com.dessine.corba.Event;
-
-import dessine_module.HostType;
-import dessine_module.Reject;
 
 public class Connection {
 	private ORB orb;
