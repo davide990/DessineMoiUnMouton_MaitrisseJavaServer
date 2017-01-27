@@ -70,13 +70,18 @@ public class Main extends Application implements MainWindowListener, ConnectionL
 		} catch (Reject e1) {
 			e1.printStackTrace();
 		}
-		
+
 		mainWindowController.clearComments();
 	}
 
 	@Override
 	public void startServerButtonClicked() {
-		connection = BackgroundConnection.getConnection(IOR_FNAME, new String[] {}, new Properties(), this);
+
+		Properties props = new Properties();
+		props.put("org.omg.CORBA.ORBInitialPort", "1234");
+		props.put("org.omg.CORBA.ORBInitialHost", "127.0.0.1");
+
+		connection = BackgroundConnection.getConnection(IOR_FNAME, new String[] {}, props, this);
 		connection.start();
 	}
 
