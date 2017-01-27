@@ -78,8 +78,8 @@ public class Main extends Application implements MainWindowListener, ConnectionL
 	public void startServerButtonClicked() {
 
 		Properties props = new Properties();
-		props.put("org.omg.CORBA.ORBInitialPort", "1234");
-		props.put("org.omg.CORBA.ORBInitialHost", "127.0.0.1");
+		props.put("org.omg.CORBA.ORBInitialPort", mainWindowController.initialHostPort());
+		props.put("org.omg.CORBA.ORBInitialHost", mainWindowController.initialHostAddress());
 
 		connection = BackgroundConnection.getConnection(IOR_FNAME, new String[] {}, props, this);
 		connection.start();

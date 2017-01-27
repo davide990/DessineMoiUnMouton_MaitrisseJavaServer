@@ -17,7 +17,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
-import javafx.scene.input.MouseEvent;
 
 public class MainWindowController {
 
@@ -42,10 +41,24 @@ public class MainWindowController {
 	private TextField commentTextField;
 
 	@FXML
+	private TextField initialHostAddressTextField;
+
+	@FXML
+	private TextField initialHostPortTextField;
+
+	@FXML
 	private ListView<String> commentsListView;
 
 	public static final ObservableList<EventListEntry> events = FXCollections.observableArrayList();
 	public static final ObservableList<String> comments = FXCollections.observableArrayList();
+
+	public String initialHostAddress() {
+		return initialHostAddressTextField.getText();
+	}
+
+	public String initialHostPort() {
+		return initialHostPortTextField.getText();
+	}
 
 	public void init() {
 		listView.setCellFactory(param -> new ListCell<EventListEntry>() {
