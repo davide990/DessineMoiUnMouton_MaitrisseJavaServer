@@ -16,6 +16,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 
 public class MainWindowController {
@@ -32,7 +33,7 @@ public class MainWindowController {
 	private Button stopServerButton;
 
 	@FXML
-	private ListView<EventListEntry> listView;
+	private ListView<EventListEntry> imageListView;
 
 	@FXML
 	private Button addCommentButton;
@@ -49,6 +50,9 @@ public class MainWindowController {
 	@FXML
 	private ListView<String> commentsListView;
 
+	@FXML
+	private TextArea imageTextArea;
+
 	public static final ObservableList<EventListEntry> events = FXCollections.observableArrayList();
 	public static final ObservableList<String> comments = FXCollections.observableArrayList();
 
@@ -61,7 +65,7 @@ public class MainWindowController {
 	}
 
 	public void init() {
-		listView.setCellFactory(param -> new ListCell<EventListEntry>() {
+		imageListView.setCellFactory(param -> new ListCell<EventListEntry>() {
 			@Override
 			protected void updateItem(EventListEntry item, boolean empty) {
 				super.updateItem(item, empty);
@@ -75,12 +79,14 @@ public class MainWindowController {
 			}
 		});
 
-		listView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<EventListEntry>() {
+		imageListView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<EventListEntry>() {
 			@Override
 			public void changed(ObservableValue<? extends EventListEntry> observable, EventListEntry oldValue,
 					EventListEntry newValue) {
 				Logger.getLogger(MainWindowController.class.getName()).log(Level.INFO,
 						"Selected ticket " + newValue.ticket());
+
+				imageTextArea.setText(new String(newValue.event().image().data));
 
 				if (listener != null) {
 					listener.imageSelected(newValue.event(), newValue.ticket());
@@ -95,7 +101,7 @@ public class MainWindowController {
 			@Override
 			public void run() {
 				events.add(new EventListEntry(event, Ticket));
-				listView.setItems(events);
+				imageListView.setItems(events);
 			}
 		});
 	}
@@ -129,6 +135,12 @@ public class MainWindowController {
 		Logger.getLogger(MainWindowController.class.getName()).log(Level.INFO, "Stop server button pressed");
 		stopServerButton.setDisable(true);
 		startServerButton.setDisable(false);
+
+		comments.clear();
+		commentTextField.clear();
+		events.clear();
+		imageListView.setItems(events);
+
 		if (listener != null) {
 			listener.stopServerButtonClicked();
 		}
@@ -146,6 +158,11 @@ public class MainWindowController {
 		if (listener != null) {
 			listener.addedComment(comment);
 		}
+	}
+
+	public void removeEvent(Event e) {
+		events.removeIf(x -> x.event() == e);
+		imageListView.setItems(events);
 	}
 
 	public void clearComments() {

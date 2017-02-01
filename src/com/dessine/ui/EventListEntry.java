@@ -26,10 +26,6 @@ class EventListEntry {
 			return false;
 
 		EventListEntry e = (EventListEntry) obj;
-		/*
-		 * System.out.println("My ticket: "+ticket);
-		 * System.out.println("Other ticket: "+e.ticket());
-		 */
 		return ticket == e.ticket();
 	}
 

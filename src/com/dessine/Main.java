@@ -1,6 +1,8 @@
 package com.dessine;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -17,15 +19,15 @@ import dessine_module.Reject;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
 public class Main extends Application implements MainWindowListener, ConnectionListener {
 
-	private static String IOR_FNAME = "/tmp/ior";
+
 	private MainWindowController mainWindowController;
 	private BackgroundConnection connection;
-
 	Event selectedEvent;
 	int selectedEventTicket;
 	List<String> comments;
@@ -36,6 +38,7 @@ public class Main extends Application implements MainWindowListener, ConnectionL
 
 	@Override
 	public void start(Stage primaryStage) {
+
 		primaryStage.setTitle("Event Handling");
 
 		try {
@@ -64,14 +67,47 @@ public class Main extends Application implements MainWindowListener, ConnectionL
 		Event e = new Event(selectedEvent.image(), selectedEvent.host());
 		comments.forEach(c -> e.addComment(c));
 
-		// Create a new Event with the comments
+		// Push the event in the outgoing events queue
 		try {
 			connection.connection().pushOutgoing(e);
-		} catch (Reject e1) {
-			e1.printStackTrace();
+		} catch (Reject e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
 		}
 
+		// Tell the client that I have something for him
+		try {
+			sendToPort(e.host().ipAddress, e.host().port, Integer.toString(selectedEventTicket));
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			return;
+		}
+
+		// Clear the comments list and show an information dialog
 		mainWindowController.clearComments();
+		mainWindowController.removeEvent(e);
+		Alert alert = new Alert(Alert.AlertType.INFORMATION);
+		alert.setTitle("Dessine");
+		alert.setHeaderText("Comments sent");
+		alert.setContentText("Ticket: " + selectedEventTicket);
+		alert.showAndWait();
+	}
+
+	public void sendToPort(String address, String port, String ticket) throws IOException {
+		Socket Socket = null;
+		PrintWriter out = null;
+
+		try {
+			Socket = new Socket(address, Integer.parseInt(port));
+			out = new PrintWriter(Socket.getOutputStream(), true);
+			out.print(ticket);
+			out.close();
+		} catch (IOException e) {
+			return;
+		} finally {
+			Socket.close();
+		}
 	}
 
 	@Override
@@ -81,7 +117,7 @@ public class Main extends Application implements MainWindowListener, ConnectionL
 		props.put("org.omg.CORBA.ORBInitialPort", mainWindowController.initialHostPort());
 		props.put("org.omg.CORBA.ORBInitialHost", mainWindowController.initialHostAddress());
 
-		connection = BackgroundConnection.getConnection(IOR_FNAME, new String[] {}, props, this);
+		connection = BackgroundConnection.getConnection(new String[] {}, props, this);
 		connection.start();
 	}
 

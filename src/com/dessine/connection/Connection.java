@@ -50,6 +50,7 @@ public class Connection {
 		instance.pushOutgoing(e);
 	}
 
+	/***/
 	public static Connection createConnection(String iorFname, String[] args, Properties props,
 			ConnectionListener listener) {
 		Connection c = new Connection();
@@ -69,24 +70,21 @@ public class Connection {
 		return c;
 	}
 
-	public static Connection createRemoteConnection(String iorFname, String[] args, Properties props,
-			ConnectionListener listener) {
+	public static Connection createRemoteConnection(String[] args, Properties props, ConnectionListener listener) {
 
 		Connection c = new Connection();
 		try {
-			
-
 			c.orb = ORB.init(args, props);
 			c.rootPOA = POAHelper.narrow(c.orb.resolve_initial_references("RootPOA"));
 			c.rootPOA.the_POAManager().activate();
 			c.instance = new CommunicationImpl();
 			c.instance.listener = listener;
-			//byte[] connectionID = c.rootPOA.activate_object(c.instance);
+			/* byte[] connectionID = */c.rootPOA.activate_object(c.instance);
 			NamingContextExt ctx = NamingContextExtHelper.narrow(c.orb.resolve_initial_references("NameService"));
 			registerToContext(c.rootPOA, c.instance, ctx.to_name(CONNECTION_ID), ctx);
 
 			System.err.println("Server set up and running...\n");
-		} catch (InvalidName | AdapterInactive //| WrongPolicy | ServantAlreadyActive
+		} catch (InvalidName | AdapterInactive | ServantAlreadyActive | WrongPolicy
 				| org.omg.CosNaming.NamingContextPackage.InvalidName ex) {
 			Logger.getLogger(Connection.class.getName()).log(Level.SEVERE, null, ex);
 		} finally {

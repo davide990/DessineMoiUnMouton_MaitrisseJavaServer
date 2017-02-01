@@ -3,7 +3,6 @@ package com.dessine.corba;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 import dessine_module.HostInfo;
 import dessine_module.Image;
 
@@ -39,8 +38,17 @@ public class Event {
 	}
 
 	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof Event))
+			return false;
+
+		Event e = (Event) obj;
+		return image.data == e.image().data;
+	}
+
+	@Override
 	public String toString() {
-		return "Event [Image " +image.width + "x" + image.height + " Bytes: " + image.bytesCount + ", host=" + host
+		return "Event [Image " + image.width + "x" + image.height + " Bytes: " + image.bytesCount + ", host=" + host
 				+ "]";
 	}
 }

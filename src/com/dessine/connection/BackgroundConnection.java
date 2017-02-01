@@ -11,17 +11,17 @@ public class BackgroundConnection extends Thread {
 	private BackgroundConnection() {
 	}
 
-	public static BackgroundConnection getConnection(String iorFname, String[] args, Properties prop,
+	public static BackgroundConnection getConnection(String[] args, Properties prop,
 			ConnectionListener listener) {
 		Objects.requireNonNull(listener);
-		Objects.requireNonNull(iorFname);
+		//Objects.requireNonNull(iorFname);
 
 		BackgroundConnection c = new BackgroundConnection();
 
 		// c.connection = Connection.createConnection(iorFname, args, prop,
 		// listener);
 
-		c.connection = Connection.createRemoteConnection(iorFname, args, prop, listener);
+		c.connection = Connection.createRemoteConnection(args, prop, listener);
 
 		c.listener = listener;
 
